@@ -1,307 +1,335 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Product + PVC Bundle Processor</title>
+  <title>Final Countdown</title>
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
     body {
-      font-family: Arial, sans-serif;
-      padding: 30px;
-      background: #f2f2f2;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
     }
-    textarea {
+    
+    .container {
+      max-width: 800px;
       width: 100%;
-      font-size: 14px;
-      font-family: monospace;
-      margin-bottom: 10px;
-    }
-    button {
-      padding: 10px 20px;
-      margin: 10px 0;
-      background: #007BFF;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-      background: white;
-    }
-    th, td {
-      border: 1px solid #999;
-      padding: 6px 10px;
       text-align: center;
-      font-size: 14px;
+      position: relative;
+      z-index: 2;
     }
-    th {
-      background: #007BFF;
-      color: white;
+    
+    .title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      margin-bottom: 15px;
+      background: linear-gradient(90deg, #ff4e50, #fc913a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 5px 15px rgba(255, 78, 80, 0.3);
+      letter-spacing: -1px;
     }
-    tfoot td {
-      font-weight: bold;
-      background-color: #dff0d8;
+    
+    .subtitle {
+      font-size: 1.2rem;
+      color: #a0a0a0;
+      margin-bottom: 40px;
+      font-weight: 300;
     }
-    h2 {
+    
+    .countdown-container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 40px;
+      margin-bottom: 40px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    }
+    
+    .countdown {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      flex-wrap: wrap;
+    }
+    
+    .time-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .time-value {
+      font-size: 4rem;
+      font-weight: 700;
+      line-height: 1;
+      color: #00d4ff;
+      text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+    }
+    
+    .time-label {
+      font-size: 0.9rem;
+      color: #888;
+      margin-top: 8px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    
+    .date-range {
+      margin-top: 30px;
+      font-size: 1rem;
+      color: #aaa;
+      letter-spacing: 0.5px;
+    }
+    
+    .motivation {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
       margin-top: 40px;
-      color: #333;
-      border-bottom: 2px solid #ccc;
-      padding-bottom: 5px;
+    }
+    
+    .motive-tag {
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-size: 0.95rem;
+      color: #f5f5f5;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .motive-tag::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+    
+    .motive-tag:hover::before {
+      left: 100%;
+    }
+    
+    .motive-tag:hover {
+      background: rgba(255, 255, 255, 0.12);
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .progress-container {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      margin: 25px 0;
+      overflow: hidden;
+    }
+    
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #ff4e50, #fc913a);
+      border-radius: 3px;
+      width: 0%;
+      transition: width 1s ease;
+    }
+    
+    .particles {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    .particle {
+      position: absolute;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      pointer-events: none;
+    }
+    
+    @media (max-width: 600px) {
+      .title {
+        font-size: 2.5rem;
+      }
+      
+      .time-value {
+        font-size: 3rem;
+      }
+      
+      .countdown {
+        gap: 15px;
+      }
     }
   </style>
 </head>
 <body>
-
-  <!-- PART DEMAND PROCESSOR FIRST -->
-  <h2>📊 Part Demand Processor</h2>
-  <textarea id="inputText" placeholder="Paste product demand text here..." rows="10"></textarea>
-  <button onclick="processData()">Process Demand</button>
-  <div id="list1"></div>
-
-  <hr />
-
-  <!-- PVC BUNDLE CALCULATOR BELOW -->
-  <h2>📦 PVC Bundle Calculator (with Barcode)</h2>
-  <textarea id="pvcInput" placeholder="Paste PVC data like: #2121 0.9X45 6 Rolls" rows="7"></textarea>
-  <button onclick="processPVC()">Calculate Bundles</button>
-  <table id="pvcOutput"></table>
+  <div class="particles" id="particles"></div>
+  
+  <div class="container">
+    <h1 class="title">Final Countdown</h1>
+    <p class="subtitle" id="todayDate"></p>
+    
+    <div class="countdown-container">
+      <div class="countdown">
+        <div class="time-unit">
+          <div class="time-value" id="days">00</div>
+          <div class="time-label">Days</div>
+        </div>
+        <div class="time-unit">
+          <div class="time-value" id="hours">00</div>
+          <div class="time-label">Hours</div>
+        </div>
+        <div class="time-unit">
+          <div class="time-value" id="minutes">00</div>
+          <div class="time-label">Minutes</div>
+        </div>
+        <div class="time-unit">
+          <div class="time-value" id="seconds">00</div>
+          <div class="time-label">Seconds</div>
+        </div>
+      </div>
+      
+      <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      
+      <div class="date-range">4 August 2025 – 31 December 2025</div>
+    </div>
+    
+    <div class="motivation">
+      <div class="motive-tag">No Regrets</div>
+      <div class="motive-tag">All In</div>
+      <div class="motive-tag">Unstoppable</div>
+      <div class="motive-tag">Relentless</div>
+      <div class="motive-tag">Legacy</div>
+    </div>
+  </div>
 
   <script>
-    // PVC BUNDLE LOGIC (unchanged)
-    function processPVC() {
-      const rawText = document.getElementById('pvcInput').value.trim();
-      const lines = rawText.split('\n');
-      const output = [];
-
-      let totalRolls = 0;
-      let total2ftBundles = 0;
-      let total3ftBundles = 0;
-      let total4ftBundles = 0;
-      let total5ftBundles = 0;
-
-      for (let line of lines) {
-        const widthMatch = line.match(/([0-9]+\.[0-9]+)\s*[xX]/i);
-        const rollsMatch = line.match(/(\d+(\.\d+)?)\s*Roll/i);
-        const barcodeMatch = line.match(/#(\d+)/);
-
-        const width = widthMatch ? parseFloat(widthMatch[1]) : 0;
-        const rolls = rollsMatch ? parseFloat(rollsMatch[1]) : 0;
-        const barcode = barcodeMatch ? "#" + barcodeMatch[1] : "N/A";
-
-        let bundleRule = 'Unknown';
-        let bundles = 0;
-
-        if (width === 0.9) {
-          bundleRule = '4 rolls/bundle (3ft)';
-          bundles = rolls / 4;
-          total3ftBundles += bundles;
-        } else if (width === 1.22) {
-          bundleRule = '2 rolls/bundle (4ft)';
-          bundles = rolls / 2;
-          total4ftBundles += bundles;
-        } else if (width >= 0.61 && width < 1.5) {
-          bundleRule = '2 rolls/bundle (2ft)';
-          bundles = rolls / 2;
-          total2ftBundles += bundles;
-        } else if (width >= 1.5) {
-          bundleRule = '4 rolls/bundle (5ft)';
-          bundles = rolls / 4;
-          total5ftBundles += bundles;
-        }
-
-        totalRolls += rolls;
-
-        output.push({ barcode, width, rolls, bundleRule, bundles });
+    // Set today's date
+    const today = new Date();
+    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+    const formattedDate = today.toLocaleDateString('en-US', options);
+    document.getElementById("todayDate").textContent = `Today: ${formattedDate}`;
+    
+    // Countdown variables
+    const endDate = new Date("2025-12-31T23:59:59");
+    const startDate = new Date("2025-08-04T00:00:00");
+    const totalDuration = endDate - startDate;
+    
+    // Update countdown every second
+    function updateCountdown() {
+      const now = new Date();
+      const timeDiff = endDate - now;
+      
+      if (timeDiff <= 0) {
+        document.getElementById("days").innerText = "00";
+        document.getElementById("hours").innerText = "00";
+        document.getElementById("minutes").innerText = "00";
+        document.getElementById("seconds").innerText = "00";
+        document.getElementById("progressBar").style.width = "100%";
+        return;
       }
-
-      const grandTotalBundles = total2ftBundles + total3ftBundles + total4ftBundles + total5ftBundles;
-
-      let html = `
-        <thead>
-          <tr>
-            <th>Barcode</th>
-            <th>Width (m)</th>
-            <th>Rolls</th>
-            <th>Bundle Rule</th>
-            <th>Bundles</th>
-          </tr>
-        </thead>
-        <tbody>
-      `;
-
-      for (let row of output) {
-        html += `
-          <tr>
-            <td>${row.barcode}</td>
-            <td>${row.width}</td>
-            <td>${row.rolls}</td>
-            <td>${row.bundleRule}</td>
-            <td>${row.bundles.toFixed(2)}</td>
-          </tr>
-        `;
-      }
-
-      html += `
-        </tbody>
-        <tfoot>
-          <tr>
-            <td colspan="2">Total Rolls</td>
-            <td>${totalRolls.toFixed(2)}</td>
-            <td>Total 2ft Bundles</td>
-            <td>${total2ftBundles.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td colspan="3"></td>
-            <td>Total 3ft Bundles</td>
-            <td>${total3ftBundles.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td colspan="3"></td>
-            <td>Total 4ft Bundles</td>
-            <td>${total4ftBundles.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td colspan="3"></td>
-            <td>Total 5ft Bundles</td>
-            <td>${total5ftBundles.toFixed(2)}</td>
-          </tr>
-          <tr>
-            <td colspan="4">Grand Total Bundles</td>
-            <td>${grandTotalBundles.toFixed(2)}</td>
-          </tr>
-        </tfoot>
-      `;
-
-      document.getElementById('pvcOutput').innerHTML = html;
+      
+      // Calculate time units
+      const days = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeDiff % (1000 * 60)) / 1000);
+      
+      // Update DOM
+      document.getElementById("days").innerText = days.toString().padStart(2, '0');
+      document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
+      document.getElementById("minutes").innerText = minutes.toString().padStart(2, '0');
+      document.getElementById("seconds").innerText = seconds.toString().padStart(2, '0');
+      
+      // Update progress bar
+      const elapsed = now - startDate;
+      const progress = Math.min(100, Math.max(0, (elapsed / totalDuration) * 100));
+      document.getElementById("progressBar").style.width = `${progress}%`;
     }
-
-    // PART DEMAND LOGIC (unchanged)
-    function processData() {
-      const text = document.getElementById("inputText").value.trim();
-      const lines = text.split("\n");
-
-      const demandData = {};
-      let totalDemand = 0, totalQty = 0;
-      let totalLF1ft = 0, totalLF2ft = 0, totalLF1ft48 = 0;
-      let totalDoubleSide = 0, totalCommando = 0, totalTomming = 0;
-
-      for (const line of lines) {
-        const parts = line.split(/\t| {2,}/);
-        const partName = parts[0]?.trim();
-        const barcode = parts[1]?.trim();
-        const demand = parseFloat(parts[2]) || 0;
-        const qty = parseFloat(parts[3]) || 0;
-
-        if (!barcode) continue;
-
-        if (!demandData[barcode]) {
-          demandData[barcode] = {
-            partName,
-            barcode,
-            demand: 0,
-            quantity: 0,
-            LF1ft: 0,
-            LF2ft: 0,
-            LF1ft48: 0,
-            DoubleSide: 0,
-            Commando: 0,
-            Tomming: 0
-          };
-        }
-
-        const row = demandData[barcode];
-        row.demand += demand;
-        row.quantity += qty;
-
-        if (/LAMP FILM 1FT X 7.5M/i.test(partName) && !/(48|\[48\]|\(48\))/i.test(partName)) {
-          row.LF1ft += demand / 72;
-        }
-        if (/LAMP FILM 2FT X 7.5M/i.test(partName)) {
-          row.LF2ft += demand / 48;
-        }
-        if (/LAMP FILM 1FT/i.test(partName) && /(48|\[48\]|\(48\))/i.test(partName)) {
-          row.LF1ft48 += demand / 48;
-        }
-        if (/DOUBLE SIDE TAPE KANGARO/i.test(partName)) {
-          row.DoubleSide += demand / 68;
-        }
-        if (/DOUBLE SIDE TAPE COMMANDO/i.test(partName)) {
-          row.Commando += demand / 52;
-        }
-        if (/RT TM 1FT\*50Y/i.test(partName)) {
-          row.Tomming += demand / 68;
-        }
-
-        totalDemand += demand;
-        totalQty += qty;
-        totalLF1ft += row.LF1ft;
-        totalLF2ft += row.LF2ft;
-        totalLF1ft48 += row.LF1ft48;
-        totalDoubleSide += row.DoubleSide;
-        totalCommando += row.Commando;
-        totalTomming += row.Tomming;
+    
+    // Initial call and set interval
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+    
+    // Create particles
+    function createParticles() {
+      const particlesContainer = document.getElementById("particles");
+      const particleCount = 50;
+      
+      for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement("div");
+        particle.classList.add("particle");
+        
+        // Random size
+        const size = Math.random() * 5 + 1;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        
+        // Random position
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
+        
+        // Random opacity
+        particle.style.opacity = Math.random() * 0.5 + 0.1;
+        
+        // Random animation duration
+        const duration = Math.random() * 20 + 10;
+        particle.style.animation = `float ${duration}s infinite linear`;
+        
+        particlesContainer.appendChild(particle);
       }
-
-      let list1HTML = `<h2>List 1: Barcode-wise Demand and Quantity</h2><table><tr>
-        <th>Barcode</th>
-        <th>Demand</th>
-        <th>Quantity</th>
-        <th>Difference</th>
-        <th>Status</th>
-        <th>LF1ft</th>
-        <th>LF2ft</th>
-        <th>LF1ft48</th>
-        <th>DoubleSide</th>
-        <th>Commando</th>
-        <th>Tomming</th>
-      </tr>`;
-
-      for (const row of Object.values(demandData)) {
-        const diff = row.demand - row.quantity;
-        const statusIcon = diff === 0
-          ? '<span style="color:green;">&#10004;</span>'
-          : '<span style="color:red;">&#10008;</span>';
-
-        list1HTML += `<tr>
-          <td>${row.barcode}</td>
-          <td>${row.demand}</td>
-          <td>${row.quantity}</td>
-          <td>${diff.toFixed(2)}</td>
-          <td>${statusIcon}</td>
-          <td>${row.LF1ft.toFixed(2)}</td>
-          <td>${row.LF2ft.toFixed(2)}</td>
-          <td>${row.LF1ft48.toFixed(2)}</td>
-          <td>${row.DoubleSide.toFixed(2)}</td>
-          <td>${row.Commando.toFixed(2)}</td>
-          <td>${row.Tomming.toFixed(2)}</td>
-        </tr>`;
-      }
-
-      list1HTML += `<tr style="font-weight:bold;background:#e0e0e0">
-        <td>Total</td>
-        <td>${totalDemand.toFixed(2)}</td>
-        <td>${totalQty.toFixed(2)}</td>
-        <td>${(totalDemand - totalQty).toFixed(2)}</td>
-        <td>-</td>
-        <td>${totalLF1ft.toFixed(2)}</td>
-        <td>${totalLF2ft.toFixed(2)}</td>
-        <td>${totalLF1ft48.toFixed(2)}</td>
-        <td>${totalDoubleSide.toFixed(2)}</td>
-        <td>${totalCommando.toFixed(2)}</td>
-        <td>${totalTomming.toFixed(2)}</td>
-      </tr>`;
-
-      const grandTotal = totalLF1ft + totalLF2ft + totalLF1ft48 + totalDoubleSide + totalCommando + totalTomming;
-      list1HTML += `<tr style="font-weight:bold;background:#d9edf7; color:#000;">
-        <td colspan="5">Grand Total of LF1ft + LF2ft + LF1ft48 + DoubleSide + Commando + Tomming</td>
-        <td colspan="6">${grandTotal.toFixed(2)}</td>
-      </tr>`;
-
-      list1HTML += `</table>`;
-      document.getElementById("list1").innerHTML = list1HTML;
     }
+    
+    // Add floating animation
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes float {
+        0% {
+          transform: translateY(0) translateX(0);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.4;
+        }
+        90% {
+          opacity: 0.4;
+        }
+        100% {
+          transform: translateY(-100vh) translateX(20px);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Initialize particles
+    createParticles();
   </script>
 </body>
 </html>
