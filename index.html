@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Product + PVC Bundle Processor</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background: #f2f2f2;
+    }
+    textarea {
+      width: 100%;
+      font-size: 14px;
+      font-family: monospace;
+      margin-bottom: 10px;
+    }
+    button {
+      padding: 10px 20px;
+      margin: 10px 0;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: white;
+    }
+    th, td {
+      border: 1px solid #999;
+      padding: 6px 10px;
+      text-align: center;
+      font-size: 14px;
+    }
+    th {
+      background: #007BFF;
+      color: white;
+    }
+    tfoot td {
+      font-weight: bold;
+      background-color: #dff0d8;
+    }
+    h2 {
+      margin-top: 40px;
+      color: #333;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- PART DEMAND PROCESSOR FIRST -->
+  <h2>📊 Part Demand Processor</h2>
+  <textarea id="inputText" placeholder="Paste product demand text here..." rows="10"></textarea>
+  <button onclick="processData()">Process Demand</button>
+  <div id="list1"></div>
+
+  <hr />
+
+  <!-- PVC BUNDLE CALCULATOR BELOW -->
+  <h2>📦 PVC Bundle Calculator (with Barcode)</h2>
+  <textarea id="pvcInput" placeholder="Paste PVC data like: #2121 0.9X45 6 Rolls" rows="7"></textarea>
+  <button onclick="processPVC()">Calculate Bundles</button>
+  <table id="pvcOutput"></table>
+
+  <script>
+    // PVC BUNDLE LOGIC (unchanged)
+    function processPVC() {
+      const rawText = document.getElementById('pvcInput').value.trim();
+      const lines = rawText.split('\n');
+      const output = [];
+
+      let totalRolls = 0;
+      let total2ftBundles = 0;
+      let total3ftBundles = 0;
+      let total4ftBundles = 0;
+      let total5ftBundles = 0;
+
+      for (let line of lines) {
+        const widthMatch = line.match(/([0-9]+\.[0-9]+)\s*[xX]/i);
+        const rollsMatch = line.match(/(\d+(\.\d+)?)\s*Roll/i);
+        const barcodeMatch = line.match(/#(\d+)/);
+
+        const width = widthMatch ? parseFloat(widthMatch[1]) : 0;
+        const rolls = rollsMatch ? parseFloat(rollsMatch[1]) : 0;
+        const barcode = barcodeMatch ? "#" + barcodeMatch[1] : "N/A";
+
+        let bundleRule = 'Unknown';
+        let bundles = 0;
+
+        if (width === 0.9) {
+          bundleRule = '4 rolls/bundle (3ft)';
+          bundles = rolls / 4;
+          total3ftBundles += bundles;
+        } else if (width === 1.22) {
+          bundleRule = '2 rolls/bundle (4ft)';
+          bundles = rolls / 2;
+          total4ftBundles += bundles;
+        } else if (width >= 0.61 && width < 1.5) {
+          bundleRule = '2 rolls/bundle (2ft)';
+          bundles = rolls / 2;
+          total2ftBundles += bundles;
+        } else if (width >= 1.5) {
+          bundleRule = '4 rolls/bundle (5ft)';
+          bundles = rolls / 4;
+          total5ftBundles += bundles;
+        }
+
+        totalRolls += rolls;
+
+        output.push({ barcode, width, rolls, bundleRule, bundles });
+      }
+
+      const grandTotalBundles = total2ftBundles + total3ftBundles + total4ftBundles + total5ftBundles;
+
+      let html = `
+        <thead>
+          <tr>
+            <th>Barcode</th>
+            <th>Width (m)</th>
+            <th>Rolls</th>
+            <th>Bundle Rule</th>
+            <th>Bundles</th>
+          </tr>
+        </thead>
+        <tbody>
+      `;
+
+      for (let row of output) {
+        html += `
+          <tr>
+            <td>${row.barcode}</td>
+            <td>${row.width}</td>
+            <td>${row.rolls}</td>
+            <td>${row.bundleRule}</td>
+            <td>${row.bundles.toFixed(2)}</td>
+          </tr>
+        `;
+      }
+
+      html += `
+        </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="2">Total Rolls</td>
+            <td>${totalRolls.toFixed(2)}</td>
+            <td>Total 2ft Bundles</td>
+            <td>${total2ftBundles.toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td colspan="3"></td>
+            <td>Total 3ft Bundles</td>
+            <td>${total3ftBundles.toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td colspan="3"></td>
+            <td>Total 4ft Bundles</td>
+            <td>${total4ftBundles.toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td colspan="3"></td>
+            <td>Total 5ft Bundles</td>
+            <td>${total5ftBundles.toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td colspan="4">Grand Total Bundles</td>
+            <td>${grandTotalBundles.toFixed(2)}</td>
+          </tr>
+        </tfoot>
+      `;
+
+      document.getElementById('pvcOutput').innerHTML = html;
+    }
+
+    // PART DEMAND LOGIC (unchanged)
+    function processData() {
+      const text = document.getElementById("inputText").value.trim();
+      const lines = text.split("\n");
+
+      const demandData = {};
+      let totalDemand = 0, totalQty = 0;
+      let totalLF1ft = 0, totalLF2ft = 0, totalLF1ft48 = 0;
+      let totalDoubleSide = 0, totalCommando = 0, totalTomming = 0;
+
+      for (const line of lines) {
+        const parts = line.split(/\t| {2,}/);
+        const partName = parts[0]?.trim();
+        const barcode = parts[1]?.trim();
+        const demand = parseFloat(parts[2]) || 0;
+        const qty = parseFloat(parts[3]) || 0;
+
+        if (!barcode) continue;
+
+        if (!demandData[barcode]) {
+          demandData[barcode] = {
+            partName,
+            barcode,
+            demand: 0,
+            quantity: 0,
+            LF1ft: 0,
+            LF2ft: 0,
+            LF1ft48: 0,
+            DoubleSide: 0,
+            Commando: 0,
+            Tomming: 0
+          };
+        }
+
+        const row = demandData[barcode];
+        row.demand += demand;
+        row.quantity += qty;
+
+        if (/LAMP FILM 1FT X 7.5M/i.test(partName) && !/(48|\[48\]|\(48\))/i.test(partName)) {
+          row.LF1ft += demand / 72;
+        }
+        if (/LAMP FILM 2FT X 7.5M/i.test(partName)) {
+          row.LF2ft += demand / 48;
+        }
+        if (/LAMP FILM 1FT/i.test(partName) && /(48|\[48\]|\(48\))/i.test(partName)) {
+          row.LF1ft48 += demand / 48;
+        }
+        if (/DOUBLE SIDE TAPE KANGARO/i.test(partName)) {
+          row.DoubleSide += demand / 68;
+        }
+        if (/DOUBLE SIDE TAPE COMMANDO/i.test(partName)) {
+          row.Commando += demand / 52;
+        }
+        if (/RT TM 1FT\*50Y/i.test(partName)) {
+          row.Tomming += demand / 68;
+        }
+
+        totalDemand += demand;
+        totalQty += qty;
+        totalLF1ft += row.LF1ft;
+        totalLF2ft += row.LF2ft;
+        totalLF1ft48 += row.LF1ft48;
+        totalDoubleSide += row.DoubleSide;
+        totalCommando += row.Commando;
+        totalTomming += row.Tomming;
+      }
+
+      let list1HTML = `<h2>List 1: Barcode-wise Demand and Quantity</h2><table><tr>
+        <th>Barcode</th>
+        <th>Demand</th>
+        <th>Quantity</th>
+        <th>Difference</th>
+        <th>Status</th>
+        <th>LF1ft</th>
+        <th>LF2ft</th>
+        <th>LF1ft48</th>
+        <th>DoubleSide</th>
+        <th>Commando</th>
+        <th>Tomming</th>
+      </tr>`;
+
+      for (const row of Object.values(demandData)) {
+        const diff = row.demand - row.quantity;
+        const statusIcon = diff === 0
+          ? '<span style="color:green;">&#10004;</span>'
+          : '<span style="color:red;">&#10008;</span>';
+
+        list1HTML += `<tr>
+          <td>${row.barcode}</td>
+          <td>${row.demand}</td>
+          <td>${row.quantity}</td>
+          <td>${diff.toFixed(2)}</td>
+          <td>${statusIcon}</td>
+          <td>${row.LF1ft.toFixed(2)}</td>
+          <td>${row.LF2ft.toFixed(2)}</td>
+          <td>${row.LF1ft48.toFixed(2)}</td>
+          <td>${row.DoubleSide.toFixed(2)}</td>
+          <td>${row.Commando.toFixed(2)}</td>
+          <td>${row.Tomming.toFixed(2)}</td>
+        </tr>`;
+      }
+
+      list1HTML += `<tr style="font-weight:bold;background:#e0e0e0">
+        <td>Total</td>
+        <td>${totalDemand.toFixed(2)}</td>
+        <td>${totalQty.toFixed(2)}</td>
+        <td>${(totalDemand - totalQty).toFixed(2)}</td>
+        <td>-</td>
+        <td>${totalLF1ft.toFixed(2)}</td>
+        <td>${totalLF2ft.toFixed(2)}</td>
+        <td>${totalLF1ft48.toFixed(2)}</td>
+        <td>${totalDoubleSide.toFixed(2)}</td>
+        <td>${totalCommando.toFixed(2)}</td>
+        <td>${totalTomming.toFixed(2)}</td>
+      </tr>`;
+
+      const grandTotal = totalLF1ft + totalLF2ft + totalLF1ft48 + totalDoubleSide + totalCommando + totalTomming;
+      list1HTML += `<tr style="font-weight:bold;background:#d9edf7; color:#000;">
+        <td colspan="5">Grand Total of LF1ft + LF2ft + LF1ft48 + DoubleSide + Commando + Tomming</td>
+        <td colspan="6">${grandTotal.toFixed(2)}</td>
+      </tr>`;
+
+      list1HTML += `</table>`;
+      document.getElementById("list1").innerHTML = list1HTML;
+    }
+  </script>
+</body>
+</html>
